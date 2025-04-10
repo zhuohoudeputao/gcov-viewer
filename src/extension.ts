@@ -378,6 +378,14 @@ function createMissedLineDecoration(range: vscode.Range) {
   const decoration: vscode.DecorationOptions = {
     range: range,
     hoverMessage: "Line has not been executed",
+    renderOptions: {
+      before: { // Change from "after" to "before"
+        contentText: "",
+        color: new vscode.ThemeColor("editorCodeLens.foreground"),
+        fontStyle: "italic",
+        width: "100px", // Ensures the text width adjusts dynamically
+      },
+    },
   };
   return decoration;
 }
@@ -404,10 +412,11 @@ function createCalledLineDecoration(
     range: range,
     hoverMessage: tooltip,
     renderOptions: {
-      after: {
+      before: { // Change from "after" to "before"
         contentText: text,
         color: new vscode.ThemeColor("editorCodeLens.foreground"),
         fontStyle: "italic",
+        width: "100px", // Ensures the text width adjusts dynamically
       },
     },
   };
@@ -420,20 +429,24 @@ class LineDecorationsGroup {
 }
 
 function createDecorationsForFile(
-  fileCoverage: FileCoverage
+  fileCoverage: FileCoverage,
+  document: vscode.TextDocument
 ): LineDecorationsGroup {
   const decorations = new LineDecorationsGroup();
 
   fileCoverage.ensureAnalysed();
 
-  for (let line = 0; line < fileCoverage.maxLine!; line++) {
+  // Use the document's line count instead of fileCoverage.maxLine
+  const maxLine = document.lineCount;
+
+  for (let line = 0; line < maxLine; line++) {
     const lineCoverage = fileCoverage.dataByLine?.get(line);
-    if (lineCoverage === undefined) {
-      continue;
-    }
     const functionCoverage = fileCoverage.functionsByStart?.get(line);
     const range = createRangeForLine(line);
-
+    if (lineCoverage === undefined) {
+      decorations.missedLineDecorations.push(createMissedLineDecoration(range));
+      continue;
+    }
     if (lineCoverage.executionCount === 0) {
       decorations.missedLineDecorations.push(createMissedLineDecoration(range));
     } else {
@@ -455,7 +468,7 @@ async function decorateEditor(editor: vscode.TextEditor) {
 
   const config = getTextDocumentConfig(editor.document);
 
-  const decorations = createDecorationsForFile(fileCoverage);
+  const decorations = createDecorationsForFile(fileCoverage, editor.document);
   editor.setDecorations(
     calledLinesDecorationType,
     decorations.calledLineDecorations

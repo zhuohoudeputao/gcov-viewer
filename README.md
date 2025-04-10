@@ -8,7 +8,8 @@
 2. Run your program or tests.
 3. Open a source file in vscode and use `ctrl+shift+P` to run the `Gcov Viewer: Show` command.
 
-During compilation, `gcc` will generate a `.gcno` file next to every `.o` file. When you run the program, it will create `.gcda` files in the same location. Those contain information about how often functions and lines have been executed.
+During compilation, `gcc` will generate a `.gcno` file next to every `.o` file. When you run the program, it
+ will create `.gcda` files in the same location. Those contain information about how often functions and lines have been executed.
 
 This vscode extension uses the `gcov` program to parse these additional files and displays the information on top of your source files. For this to work, it has to find the generated `.gcda` for a given project. Those are usually in your build directory. If the extension does not find them on its own, you have to edit the `gcovViewer.buildDirectories` setting of your workspace folder. The most convenient way to do this is to use the `Gcov Viewer: Select Build Directory` command.
 
