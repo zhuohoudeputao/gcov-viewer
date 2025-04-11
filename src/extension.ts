@@ -67,11 +67,11 @@ export function activate(context: vscode.ExtensionContext) {
 
 export function deactivate() {}
 
-const calledLineColor = "rgba(50, 240, 50, 0.1)";
+// const calledLineColor = "rgba(50, 240, 50, 0.1)";
 const calledLinesDecorationType = vscode.window.createTextEditorDecorationType({
   isWholeLine: true,
-  backgroundColor: calledLineColor,
-  overviewRulerColor: calledLineColor,
+  // backgroundColor: calledLineColor,
+  // overviewRulerColor: calledLineColor,
   rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed,
 });
 
@@ -391,6 +391,22 @@ function createMissedLineDecoration(range: vscode.Range) {
   return decoration;
 }
 
+function getColorBasedOnExecutionCount(executionCount: number): string {
+  // Define the range for execution counts
+  const minExecution = 0; // Minimum execution count
+  const maxExecution = 100; // Maximum execution count (adjust as needed)
+
+  // Clamp the execution count to the range
+  const clampedExecution = Math.min(Math.max(executionCount, minExecution), maxExecution);
+
+  // Calculate the heatmap color (red to green)
+  const red = Math.floor(255 - (clampedExecution / maxExecution) * 255); // Decrease red as execution increases
+  const green = Math.floor((clampedExecution / maxExecution) * 255); // Increase green as execution increases
+  const blue = 50; // Keep blue constant for a red-green gradient
+
+  return `rgba(${red}, ${green}, ${blue}, 1)`; // Return the color as an RGBA string
+}
+
 function createCalledLineDecoration(
   range: vscode.Range,
   lineCoverage: LineCoverage,
@@ -409,13 +425,17 @@ function createCalledLineDecoration(
       (functionCoverage.calledLines / functionCoverage.totalLines) * 100;
     text += `   [${Number(coveratePercentage).toFixed(1)}%]`;
   }
+
+  // Determine the color based on executionCount
+  const color = getColorBasedOnExecutionCount(calls);
+
   const decoration: vscode.DecorationOptions = {
     range: range,
     hoverMessage: tooltip,
     renderOptions: {
       before: { // Change from "after" to "before"
         contentText: text,
-        color: new vscode.ThemeColor("editorCodeLens.foreground"),
+        color: color,
         fontStyle: "italic",
         width: "100px", // Ensures the text width adjusts dynamically
       },
