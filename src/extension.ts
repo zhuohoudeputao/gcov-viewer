@@ -61,6 +61,8 @@ export function activate(context: vscode.ExtensionContext) {
     }
   });
   vscode.window.onDidChangeActiveTextEditor(updateStatusBar);
+
+  vscode.commands.executeCommand("gcov-viewer.show");
 }
 
 export function deactivate() {}
@@ -73,11 +75,11 @@ const calledLinesDecorationType = vscode.window.createTextEditorDecorationType({
   rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed,
 });
 
-const missedLineColor = "rgba(240, 50, 50, 0.1)";
+// const missedLineColor = "";
 const missedLinesDecorationType = vscode.window.createTextEditorDecorationType({
   isWholeLine: true,
-  backgroundColor: missedLineColor,
-  overviewRulerColor: missedLineColor,
+  // backgroundColor: missedLineColor,
+  // overviewRulerColor: missedLineColor,
   rangeBehavior: vscode.DecorationRangeBehavior.ClosedClosed,
 });
 
@@ -377,7 +379,6 @@ function createTooltipForCalledLine(
 function createMissedLineDecoration(range: vscode.Range) {
   const decoration: vscode.DecorationOptions = {
     range: range,
-    hoverMessage: "Line has not been executed",
     renderOptions: {
       before: { // Change from "after" to "before"
         contentText: "",

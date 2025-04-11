@@ -31,7 +31,8 @@
     "onCommand:gcov-viewer.selectBuildDirectory",
     "onCommand:gcov-viewer.dumpPathsWithCoverageData",
     "onCommand:gcov-viewer.viewFunctionsByCallCount",
-    "onCommand:gcov-viewer.generateSummaryHTML"
+    "onCommand:gcov-viewer.generateSummaryHTML",
+    "onStartupFinished"
   ],
   "main": "./out/extension.js",
   "contributes": {
